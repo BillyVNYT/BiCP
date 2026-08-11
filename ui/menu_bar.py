@@ -1,4 +1,3 @@
-from PySide6.QtCore import QRect, QSize, Qt, Signal
 from PySide6.QtWidgets import QMenuBar
 
 class MenuBar(QMenuBar):
@@ -11,8 +10,10 @@ class MenuBar(QMenuBar):
         self.new_action = self.file_menu.addAction("New")
         self.open_action = self.file_menu.addAction("Open")
         self.save_action = self.file_menu.addAction("Save")
+        self.save_as_action = self.file_menu.addAction("Save As")
 
         self.save_action.setShortcut("Ctrl+S")
+        self.save_as_action.setShortcut("Ctrl+Shift+S")
 
         self.file_menu.addSeparator()
         self.exit_action = self.file_menu.addAction("Exit")

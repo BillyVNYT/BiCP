@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 
 from core.compiler import Compiler
 from core.runner import ProgramRunner
+from core.version import VERSION
 from core.workspace import WorkspaceError, WorkspaceManager
 from ui.code_editor import CodeEditor
 from ui.menu_bar import MenuBar
@@ -23,7 +24,7 @@ from ui.menu_bar import MenuBar
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("BiCP")
+        self.setWindowTitle(f"BiCP v{VERSION}")
         self.resize(1100, 720)
         self.setMinimumSize(760, 460)
 
@@ -40,7 +41,7 @@ class MainWindow(QMainWindow):
         self.find_box = QLineEdit()
 
         self.run_button = QPushButton("Run")
-        # self.rebuild_button = QPushButton("Rebuild")
+        self.rebuild_button = QPushButton("Rebuild")
         self.stop_button = QPushButton("Stop")
 
         self._build_ui()
@@ -58,6 +59,10 @@ class MainWindow(QMainWindow):
         )
 
         self.menu.save_action.triggered.connect(
+            self._save_code
+        )
+
+        self.menu.save_as_action.triggered.connect(
             self._save_as
         )
 
@@ -76,7 +81,7 @@ class MainWindow(QMainWindow):
         toolbar_layout.addWidget(QLabel("BiCP"))
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.run_button)
-        # toolbar_layout.addWidget(self.rebuild_button)
+        toolbar_layout.addWidget(self.rebuild_button)
         toolbar_layout.addWidget(self.stop_button)
         main_layout.addWidget(toolbar)
 
@@ -117,7 +122,7 @@ class MainWindow(QMainWindow):
 
     def _connect_signals(self) -> None:
         self.run_button.clicked.connect(lambda: self._run(force_rebuild=False))
-        # self.rebuild_button.clicked.connect(lambda: self._run(force_rebuild=True))
+        self.rebuild_button.clicked.connect(lambda: self._run(force_rebuild=True))
         self.stop_button.clicked.connect(self.runner.stop)
         self.runner.output_changed.connect(self.output_box.setPlainText)
         self.runner.busy_changed.connect(self._set_busy)
@@ -251,7 +256,7 @@ class MainWindow(QMainWindow):
 
     def _set_busy(self, busy: bool) -> None:
         self.run_button.setEnabled(not busy)
-        # self.rebuild_button.setEnabled(not busy)
+        self.rebuild_button.setEnabled(not busy)
         self.stop_button.setEnabled(busy)
 
     def _apply_styles(self) -> None:
