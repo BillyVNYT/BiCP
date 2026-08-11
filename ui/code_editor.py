@@ -39,11 +39,6 @@ class CodeEditor(QPlainTextEdit):
         self.highlight_current_line()
 
     def _install_shortcuts(self) -> None:
-        save_action = QAction("Save", self)
-        save_action.setShortcut(QKeySequence.Save)
-        save_action.triggered.connect(self.save_requested.emit)
-        self.addAction(save_action)
-
         find_action = QAction("Find", self)
         find_action.setShortcut(QKeySequence.Find)
         find_action.triggered.connect(self.find_requested.emit)

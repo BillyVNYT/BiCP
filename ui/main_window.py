@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QSplitter,
     QVBoxLayout,
     QWidget,
+    QFileDialog
 )
 
 from core.compiler import Compiler
@@ -39,7 +40,7 @@ class MainWindow(QMainWindow):
         self.find_box = QLineEdit()
 
         self.run_button = QPushButton("Run")
-        self.rebuild_button = QPushButton("Rebuild")
+        # self.rebuild_button = QPushButton("Rebuild")
         self.stop_button = QPushButton("Stop")
 
         self._build_ui()
@@ -57,7 +58,7 @@ class MainWindow(QMainWindow):
         )
 
         self.menu.save_action.triggered.connect(
-            self._save_code
+            self._save_as
         )
 
     def _build_ui(self) -> None:
@@ -75,7 +76,7 @@ class MainWindow(QMainWindow):
         toolbar_layout.addWidget(QLabel("BiCP"))
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.run_button)
-        toolbar_layout.addWidget(self.rebuild_button)
+        # toolbar_layout.addWidget(self.rebuild_button)
         toolbar_layout.addWidget(self.stop_button)
         main_layout.addWidget(toolbar)
 
@@ -116,7 +117,7 @@ class MainWindow(QMainWindow):
 
     def _connect_signals(self) -> None:
         self.run_button.clicked.connect(lambda: self._run(force_rebuild=False))
-        self.rebuild_button.clicked.connect(lambda: self._run(force_rebuild=True))
+        # self.rebuild_button.clicked.connect(lambda: self._run(force_rebuild=True))
         self.stop_button.clicked.connect(self.runner.stop)
         self.runner.output_changed.connect(self.output_box.setPlainText)
         self.runner.busy_changed.connect(self._set_busy)
@@ -128,25 +129,24 @@ class MainWindow(QMainWindow):
     def _load_workspace(self) -> None:
         try:
             self.workspace.ensure()
+            self.workspace.set_language(self.current_lang)
 
-            self.workspace.set_language(
-                self.current_lang
-            )
-
+            # Mỗi lần mở BiCP → tạo code mặc định mới
             self.editor.setPlainText(
-                self.workspace.load_code()
+                self.workspace.get_default_code()
             )
+
+            self.editor.document().setModified(False)
 
             self.input_box.setPlainText(
                 self.workspace.load_input()
             )
 
         except WorkspaceError as exc:
-
             self.output_box.setPlainText(
                 f"Workspace error\n\n{exc}"
             )
-
+            
     def _run(self, force_rebuild: bool) -> None:
         self.runner.run(
             self.editor.toPlainText(),
@@ -177,6 +177,60 @@ class MainWindow(QMainWindow):
                 f"Workspace error\n\n{exc}"
             )
 
+    def _save_as(self) -> None:
+        if self.current_lang == "cpp":
+            default_name = "main.cpp"
+            file_filter = "C++ Source (*.cpp);;All Files (*)"
+
+        elif self.current_lang == "python":
+            default_name = "main.py"
+            file_filter = "Python Files (*.py);;All Files (*)"
+
+        else:
+            default_name = "main.txt"
+            file_filter = "All Files (*)"
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save As",
+            default_name,
+            file_filter
+        )
+
+        # Người dùng bấm Cancel
+        if not file_path:
+            return
+
+        try:
+
+            with open(
+                file_path,
+                "w",
+                encoding="utf-8"
+            ) as file:
+
+                file.write(
+                    self.editor.toPlainText()
+                )
+
+            self.setWindowTitle(
+                f"BiCP - {file_path}"
+            )
+
+            self.editor.document().setModified(
+                False
+            )
+
+            self.output_box.setPlainText(
+                f"Saved:\n{file_path}"
+            )
+
+        except OSError as exc:
+
+            self.output_box.setPlainText(
+                f"Could not save file:\n\n{exc}"
+            )
+
     def _show_find(self) -> None:
         self.find_box.show()
         self.find_box.setFocus()
@@ -197,7 +251,7 @@ class MainWindow(QMainWindow):
 
     def _set_busy(self, busy: bool) -> None:
         self.run_button.setEnabled(not busy)
-        self.rebuild_button.setEnabled(not busy)
+        # self.rebuild_button.setEnabled(not busy)
         self.stop_button.setEnabled(busy)
 
     def _apply_styles(self) -> None:
