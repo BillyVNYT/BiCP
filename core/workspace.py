@@ -2,6 +2,7 @@ from pathlib import Path
 
 from core.setting import DEFAULT_CPP, DEFAULT_PYTHON
 
+from PySide6.QtCore import QStandardPaths
 
 class WorkspaceError(RuntimeError):
     pass
@@ -9,21 +10,30 @@ class WorkspaceError(RuntimeError):
 
 class WorkspaceManager:
 
-    def __init__(
-        self,
-        project_root: Path | None = None
-    ) -> None:
+    def __init__(self, project_root: Path | None = None):
 
-        self.project_root = (
-            project_root
-            or Path(__file__).resolve().parents[1]
-        )
+        if project_root is not None:
+            self.project_root = project_root
+
+        else:
+            app_data = QStandardPaths.writableLocation(
+                QStandardPaths.AppLocalDataLocation
+            )
+
+            self.project_root = Path(app_data)
 
         self.workspace_dir = (
             self.project_root / "workspace"
         )
 
-        # File input/output dùng chung
+        self.source_path = (
+            self.workspace_dir / "main.cpp"
+        )
+
+        self.executable_path = (
+            self.workspace_dir / "main.exe"
+        )
+
         self.input_path = (
             self.workspace_dir / "input.txt"
         )

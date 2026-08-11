@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from PySide6.QtCore import QStandardPaths
 
 DEFAULT_CPP = """#include <bits/stdc++.h>
 using namespace std;
@@ -41,8 +41,22 @@ MULTILINE_KEYS = {
 
 
 class SettingManager:
-    def __init__(self, path: Path | None = None) -> None:
-        self.path = path or Path(__file__).resolve().parents[1] / "config" / "setting.txt"
+    def __init__(self, path: Path | None = None):
+
+        if path is not None:
+            self.path = path
+
+        else:
+            app_data = QStandardPaths.writableLocation(
+                QStandardPaths.AppLocalDataLocation
+            )
+
+            self.path = (
+                Path(app_data)
+                / "settings"
+                / "setting.txt"
+            )
+
         self.settings = DEFAULT_SETTINGS.copy()
 
     def load(self) -> None:

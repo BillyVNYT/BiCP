@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("BiCP")
         self.resize(1100, 720)
-        self.setMinimumSize(760, 460)
+        self.setMinimumSize(500, 300)
 
         self.workspace = WorkspaceManager()
         self.compiler = Compiler()
