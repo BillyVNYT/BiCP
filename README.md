@@ -13,6 +13,13 @@ BiCP is a lightweight desktop IDE designed specifically for Competitive Programm
 - Save and Save As
 - Find in editor
 - C++ and Python language switching
+- Settings window with categorized pages
+- Persistent configuration
+- Language preference persistence
+- Editor font size and tab size configuration
+- C++ compiler configuration
+- Python interpreter configuration
+- Editable default C++ and Python templates
 
 ## Screenshots
 
@@ -55,6 +62,7 @@ The build output is created under `dist/BiCP/`.
 
 - `core/` contains workspace, compiler, runner, and version logic.
 - `ui/` contains PySide6 windows, menus, and editor widgets.
+- `config/` contains default persistent application settings.
 - `workspace/` is the local runtime workspace created and updated by the app.
 - `assets/` contains application assets such as icons.
 - `scripts/` contains developer automation such as the PyInstaller build script.
@@ -65,6 +73,7 @@ The build output is created under `dist/BiCP/`.
 - `Ctrl+S`: Save
 - `Ctrl+Shift+S`: Save As
 - `Ctrl+F`: Find
+- `Ctrl+,`: Settings
 
 ## Versioning
 

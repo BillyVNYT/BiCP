@@ -34,6 +34,7 @@ class ProgramRunner(QObject):
         self.workspace = workspace
         self.compiler = compiler
         self.timeout_ms = timeout_ms
+        self.python_interpreter = sys.executable
 
         # Lưu code đã compile riêng cho từng ngôn ngữ
         self.last_compiled_code: dict[str, str | None] = {
@@ -61,6 +62,18 @@ class ProgramRunner(QObject):
 
     def is_busy(self) -> bool:
         return self.state is not RunnerState.IDLE
+
+    def configure(
+        self,
+        timeout_ms: int,
+        python_interpreter: str,
+    ) -> None:
+
+        self.timeout_ms = timeout_ms
+        self.python_interpreter = (
+            python_interpreter
+            or sys.executable
+        )
 
     # =====================================================
     # RUN
@@ -283,7 +296,7 @@ class ProgramRunner(QObject):
         )
 
         self._start_program(
-            sys.executable,
+            self.python_interpreter,
             "Python",
             [str(python_file)]
         )

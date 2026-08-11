@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from os import pathsep
 from pathlib import Path
 
 
@@ -24,6 +25,10 @@ def main() -> int:
 
     if ICON_PATH.exists():
         command.extend(["--icon", str(ICON_PATH)])
+
+    config_dir = PROJECT_ROOT / "config"
+    if config_dir.exists():
+        command.extend(["--add-data", f"{config_dir}{pathsep}config"])
 
     command.append(str(PROJECT_ROOT / "main.py"))
     return subprocess.call(command, cwd=PROJECT_ROOT)

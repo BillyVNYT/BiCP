@@ -1,24 +1,6 @@
 from pathlib import Path
 
-
-DEFAULT_CPP = """#include <bits/stdc++.h>
-using namespace std;
-
-int main() {
-
-    return 0;
-}
-"""
-
-
-DEFAULT_PYTHON = """def main():
-
-    pass
-
-
-if __name__ == "__main__":
-    main()
-"""
+from core.setting import DEFAULT_CPP, DEFAULT_PYTHON
 
 
 class WorkspaceError(RuntimeError):
@@ -52,6 +34,8 @@ class WorkspaceManager:
 
         # Ngôn ngữ mặc định
         self.current_language = "cpp"
+        self.default_cpp = DEFAULT_CPP
+        self.default_python = DEFAULT_PYTHON
 
     # =====================================================
     # LANGUAGE
@@ -99,10 +83,10 @@ class WorkspaceManager:
     def get_default_code(self) -> str:
 
         if self.current_language == "cpp":
-            return DEFAULT_CPP
+            return self.default_cpp
 
         if self.current_language == "python":
-            return DEFAULT_PYTHON
+            return self.default_python
 
         raise WorkspaceError(
             f"Unsupported language: {self.current_language}"
@@ -132,7 +116,7 @@ class WorkspaceManager:
             if not cpp_path.exists():
 
                 cpp_path.write_text(
-                    DEFAULT_CPP,
+                    self.default_cpp,
                     encoding="utf-8"
                 )
 
@@ -147,7 +131,7 @@ class WorkspaceManager:
             if not python_path.exists():
 
                 python_path.write_text(
-                    DEFAULT_PYTHON,
+                    self.default_python,
                     encoding="utf-8"
                 )
 
@@ -178,6 +162,24 @@ class WorkspaceManager:
             raise WorkspaceError(
                 f"Could not prepare workspace: {exc}"
             ) from exc
+
+    def set_default_code(
+        self,
+        language: str,
+        code: str,
+    ) -> None:
+
+        if language == "cpp":
+            self.default_cpp = code
+            return
+
+        if language == "python":
+            self.default_python = code
+            return
+
+        raise WorkspaceError(
+            f"Unsupported language: {language}"
+        )
 
     # =====================================================
     # CODE
