@@ -8,6 +8,7 @@ class MenuBar(QMenuBar):
         self.file_menu = self.addMenu("File")
         self.language_menu = self.addMenu("language")
         self.tool_menu = self.addMenu("Tools")
+        self.website = self.addMenu("CP web")
 
         self.new_action = self.file_menu.addAction("New")
         self.open_action = self.file_menu.addAction("Open")
@@ -26,3 +27,8 @@ class MenuBar(QMenuBar):
 
         self.cpp_action = self.language_menu.addAction("C++")
         self.python_action = self.language_menu.addAction("PYTHON")
+
+        self.codeforces_action = self.website.addAction("Codeforces")
+        self.lqdoj_action = self.website.addAction("LQDOJ")
+        self.vnoi_action = self.website.addAction("VNOI")
+        self.google_action = self.website.addAction("Google")

@@ -1,5 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QTextCursor
+from PySide6.QtCore import QUrl
+from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -10,13 +12,20 @@ from PySide6.QtWidgets import (
     QSplitter,
     QVBoxLayout,
     QWidget,
-    QFileDialog
+    QFileDialog,
+    QTabWidget,
+    QDockWidget
 )
 
 from core.compiler import Compiler
 from core.runner import ProgramRunner
 from core.workspace import WorkspaceError, WorkspaceManager
 from core.setting import SettingManager
+
+from browser.codeforces import CodeforcesBrowser
+from browser.lqdoj import LqdojBrowser
+from browser.vnoi import VnoiBrowser
+from browser.google import GoogleBrowser
 
 from ui.code_editor import CodeEditor
 from ui.menu_bar import MenuBar
@@ -45,6 +54,18 @@ class MainWindow(QMainWindow):
         # self.rebuild_button = QPushButton("Rebuild")
         self.stop_button = QPushButton("Stop")
 
+        self.codeforces_dock = None
+        self.codeforces_browser = None
+
+        self.lqdoj_dock = None
+        self.lqdoj_browser = None
+
+        self.vnoi_dock = None
+        self.vnoi_browser = None
+
+        self.google_dock = None
+        self.google_browser = None
+
         self.current_lang = self.settings.get("language")
 
         self._build_ui()
@@ -67,6 +88,11 @@ class MainWindow(QMainWindow):
         )
 
         self.menu.setting_action.triggered.connect(self._show_settings)
+
+        self.menu.codeforces_action.triggered.connect(self._open_codeforces)
+        self.menu.lqdoj_action.triggered.connect(self._open_lqdoj)
+        self.menu.vnoi_action.triggered.connect(self._open_vnoi)
+        self.menu.google_action.triggered.connect(self._open_google)
 
     def _build_ui(self) -> None:
         central = QWidget()
@@ -441,3 +467,110 @@ class MainWindow(QMainWindow):
             self.output_box.setPlainText(
                 "Settings applied."
             )
+    def _open_codeforces(self) -> None:
+        if self.codeforces_dock is None:
+
+            self.codeforces_dock = QDockWidget(
+                "Codeforces",
+                self
+            )
+
+            self.codeforces_dock.setAllowedAreas(
+                Qt.LeftDockWidgetArea |
+                Qt.RightDockWidgetArea
+            )
+
+            self.codeforces_browser = CodeforcesBrowser()
+
+            self.codeforces_dock.setWidget(
+                self.codeforces_browser
+            )
+
+            self.addDockWidget(
+                Qt.RightDockWidgetArea,
+                self.codeforces_dock
+            )
+
+        self.codeforces_dock.show()
+        self.codeforces_dock.raise_()
+
+    def _open_lqdoj(self) -> None:
+        if self.lqdoj_dock is None:
+
+            self.lqdoj_dock = QDockWidget(
+                "Lqdoj",
+                self
+            )
+
+            self.lqdoj_dock.setAllowedAreas(
+                Qt.LeftDockWidgetArea |
+                Qt.RightDockWidgetArea
+            )
+
+            self.lqdoj_browser = LqdojBrowser()
+
+            self.lqdoj_dock.setWidget(
+                self.lqdoj_browser
+            )
+
+            self.addDockWidget(
+                Qt.RightDockWidgetArea,
+                self.lqdoj_dock
+            )
+
+        self.lqdoj_dock.show()
+        self.lqdoj_dock.raise_()
+
+    def _open_vnoi(self) -> None:
+        if self.vnoi_dock is None:
+
+            self.vnoi_dock = QDockWidget(
+                "VNOI",
+                self
+            )
+
+            self.vnoi_dock.setAllowedAreas(
+                Qt.LeftDockWidgetArea |
+                Qt.RightDockWidgetArea
+            )
+
+            self.vnoi_browser = VnoiBrowser()
+
+            self.vnoi_dock.setWidget(
+                self.vnoi_browser
+            )
+
+            self.addDockWidget(
+                Qt.RightDockWidgetArea,
+                self.vnoi_dock
+            )
+
+        self.vnoi_dock.show()
+        self.vnoi_dock.raise_()
+
+    def _open_google(self) -> None:
+        if self.google_dock is None:
+
+            self.google_dock = QDockWidget(
+                "Google",
+                self
+            )
+
+            self.google_dock.setAllowedAreas(
+                Qt.LeftDockWidgetArea |
+                Qt.RightDockWidgetArea
+            )
+
+            self.google_browser = GoogleBrowser()
+
+            self.google_dock.setWidget(
+                self.google_browser
+            )
+
+            self.addDockWidget(
+                Qt.RightDockWidgetArea,
+                self.google_dock
+            )
+
+        self.google_dock.show()
+        self.google_dock.raise_()
