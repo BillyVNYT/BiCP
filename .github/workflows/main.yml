@@ -52,14 +52,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          - name: Create GitHub Release
-            shell: pwsh
-            env:
-              GH_TOKEN: ${{ github.token }}
-            run: |
-              $version = "${{ github.ref_name }}".TrimStart("v")
+          $version = "${{ github.ref_name }}".TrimStart("v")
 
-              gh release create "${{ github.ref_name }}" `
-                "installer\BiCP-$version-Setup.exe" `
-                --title "BiCP ${{ github.ref_name }}" `
-                --generate-notes
+          gh release create "${{ github.ref_name }}" `
+            "installer\BiCP-$version-Setup.exe" `
+            --title "BiCP ${{ github.ref_name }}" `
+            --generate-notes
