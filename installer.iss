@@ -4,7 +4,6 @@
 #define MyAppExeName "BiCP.exe"
 
 [Setup]
-AppId={{BICP-1.2.0}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -16,8 +15,6 @@ OutputBaseFilename=BiCP-{#MyAppVersion}-Setup
 
 Compression=lzma
 SolidCompression=yes
-
-WizardStyle=modern
 
 [Files]
 Source: "dist\BiCP\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
