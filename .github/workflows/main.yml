@@ -58,7 +58,7 @@ jobs:
               GH_TOKEN: ${{ github.token }}
             run: |
               $version = "${{ github.ref_name }}".TrimStart("v")
-          
+
               gh release create "${{ github.ref_name }}" `
                 "installer\BiCP-$version-Setup.exe" `
                 --title "BiCP ${{ github.ref_name }}" `
