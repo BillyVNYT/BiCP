@@ -7,12 +7,19 @@ class MenuBar(QMenuBar):
 
         self.file_menu = self.addMenu("File")
         self.language_menu = self.addMenu("language")
+        self.tool_menu = self.addMenu("Tools")
 
         self.new_action = self.file_menu.addAction("New")
         self.open_action = self.file_menu.addAction("Open")
         self.save_action = self.file_menu.addAction("Save")
 
+        self.new_action.setShortcut("Ctrl+N")
+        self.open_action.setShortcut("Ctrl+O")
         self.save_action.setShortcut("Ctrl+S")
+
+        self.file_menu.addSeparator()
+        self.setting_action = self.file_menu.addAction("Setting")
+        self.setting_action.setShortcut("Ctrl+,")
 
         self.file_menu.addSeparator()
         self.exit_action = self.file_menu.addAction("Exit")

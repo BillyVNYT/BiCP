@@ -1,0 +1,4 @@
+theme=dark
+font_size=14
+tab_size=4
+language=cpp

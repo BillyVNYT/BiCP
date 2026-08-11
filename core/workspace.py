@@ -11,13 +11,7 @@ int main() {
 """
 
 
-DEFAULT_PYTHON = """def main():
-
-    pass
-
-
-if __name__ == "__main__":
-    main()
+DEFAULT_PYTHON = """
 """
 
 

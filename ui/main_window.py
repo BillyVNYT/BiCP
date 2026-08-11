@@ -16,9 +16,11 @@ from PySide6.QtWidgets import (
 from core.compiler import Compiler
 from core.runner import ProgramRunner
 from core.workspace import WorkspaceError, WorkspaceManager
+from core.setting import SettingManager
+
 from ui.code_editor import CodeEditor
 from ui.menu_bar import MenuBar
-
+from ui.setting_dialog import SettingsDialog
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
@@ -27,11 +29,11 @@ class MainWindow(QMainWindow):
         self.resize(1100, 720)
         self.setMinimumSize(760, 460)
 
-        self.current_lang = "cpp"
-
         self.workspace = WorkspaceManager()
         self.compiler = Compiler()
         self.runner = ProgramRunner(self.workspace, self.compiler)
+        self.settings = SettingManager()
+        self.settings.load()
 
         self.menu = MenuBar(self)
         self.editor = CodeEditor()
@@ -42,6 +44,11 @@ class MainWindow(QMainWindow):
         self.run_button = QPushButton("Run")
         # self.rebuild_button = QPushButton("Rebuild")
         self.stop_button = QPushButton("Stop")
+
+        self.current_lang = self.settings.get("language")
+        self.font_size = self.settings.get("font_size")
+        self.theme = self.settings.get("theme")
+        self.theme = self.settings.get("tab_space")
 
         self._build_ui()
         self._connect_signals()
@@ -60,6 +67,8 @@ class MainWindow(QMainWindow):
         self.menu.save_action.triggered.connect(
             self._save_as
         )
+
+        self.menu.setting_action.triggered.connect(self._show_settings)
 
     def _build_ui(self) -> None:
         central = QWidget()
@@ -299,12 +308,15 @@ class MainWindow(QMainWindow):
                 "Stop it before changing language."
             )
             return
-        
+
         if language == self.current_lang:
             return
 
         try:
-            # Lưu code của ngôn ngữ hiện tại
+            # ==============================
+            # Lưu code hiện tại
+            # ==============================
+
             self.workspace.set_language(
                 self.current_lang
             )
@@ -313,24 +325,41 @@ class MainWindow(QMainWindow):
                 self.editor.toPlainText()
             )
 
-            # Chuyển sang ngôn ngữ mới
+            # ==============================
+            # Đổi language
+            # ==============================
+
             self.workspace.set_language(
                 language
             )
 
-            # Load code của ngôn ngữ mới
+            # ==============================
+            # Dùng DEFAULT_CODE
+            # ==============================
+
             self.editor.setPlainText(
-                self.workspace.load_code()
+                self.workspace.get_default_code()
             )
 
             self.current_lang = language
 
-            self.output_box.setPlainText(
-                f"Switched to {language.upper()}"
+            self.settings.set("language", language)
+            self.settings.save()
+
+            self.editor.document().setModified(
+                False
             )
+
+            self.output_box.clear()
 
         except WorkspaceError as exc:
 
             self.output_box.setPlainText(
                 f"Workspace error\n\n{exc}"
             )
+
+    def _show_settings(self) -> None:
+        dialog = SettingsDialog(self)
+
+        if dialog.exec():
+            print("Settings applied")
