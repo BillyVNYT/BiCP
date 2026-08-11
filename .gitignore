@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# PyInstaller
+build/
+dist/
+
+# Inno Setup
+installer/
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+.pytest_cache/
