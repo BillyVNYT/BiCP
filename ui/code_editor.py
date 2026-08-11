@@ -38,6 +38,18 @@ class CodeEditor(QPlainTextEdit):
         self.update_line_number_width(0)
         self.highlight_current_line()
 
+    def configure_editor(
+        self,
+        font_size: int,
+        tab_size: int,
+    ) -> None:
+
+        font = self.font()
+        font.setPointSize(font_size)
+        self.setFont(font)
+        self.setTabStopDistance(tab_size * self.fontMetrics().horizontalAdvance(" "))
+        self.update_line_number_width(0)
+
     def _install_shortcuts(self) -> None:
         find_action = QAction("Find", self)
         find_action.setShortcut(QKeySequence.Find)

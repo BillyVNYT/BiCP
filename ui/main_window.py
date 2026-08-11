@@ -46,12 +46,10 @@ class MainWindow(QMainWindow):
         self.stop_button = QPushButton("Stop")
 
         self.current_lang = self.settings.get("language")
-        self.font_size = self.settings.get("font_size")
-        self.theme = self.settings.get("theme")
-        self.theme = self.settings.get("tab_space")
 
         self._build_ui()
         self._connect_signals()
+        self._apply_runtime_settings()
         self._load_workspace()
         self._apply_styles()
         self.setMenuBar(self.menu)
@@ -263,7 +261,75 @@ class MainWindow(QMainWindow):
         # self.rebuild_button.setEnabled(not busy)
         self.stop_button.setEnabled(busy)
 
+    def _apply_runtime_settings(self) -> None:
+        self.current_lang = self.settings.get("language", "cpp")
+
+        self.editor.configure_editor(
+            self.settings.get_int("font_size", 14),
+            self.settings.get_int("tab_size", 4),
+        )
+
+        self.compiler.configure(
+            self.settings.get("cpp_compiler", "g++") or "g++",
+            self.settings.get("cpp_standard", "c++20"),
+            self.settings.get("cpp_optimization", "O0"),
+        )
+
+        self.runner.configure(
+            self.settings.get_int("run_timeout_ms", 3000),
+            self.settings.get("python_interpreter"),
+        )
+
+        self.workspace.set_default_code(
+            "cpp",
+            self.settings.get("default_cpp"),
+        )
+        self.workspace.set_default_code(
+            "python",
+            self.settings.get("default_python"),
+        )
+
     def _apply_styles(self) -> None:
+        if self.settings.get("theme", "dark") == "light":
+            self.setStyleSheet(
+                """
+                QMainWindow, QWidget {
+                    background: #f4f6f8;
+                    color: #1d2630;
+                }
+                QLabel {
+                    color: #394656;
+                    font-weight: 600;
+                }
+                QPushButton {
+                    background: #ffffff;
+                    border: 1px solid #c8d0da;
+                    border-radius: 4px;
+                    color: #1d2630;
+                    min-height: 30px;
+                    padding: 0 14px;
+                }
+                QPushButton:hover {
+                    background: #e9eef4;
+                }
+                QPushButton:disabled {
+                    color: #99a3af;
+                    background: #edf1f5;
+                }
+                QPlainTextEdit, QLineEdit {
+                    background: #ffffff;
+                    border: 1px solid #c8d0da;
+                    border-radius: 4px;
+                    color: #1d2630;
+                    selection-background-color: #bfd8f4;
+                }
+                QSplitter::handle {
+                    background: #d5dde7;
+                }
+                """
+            )
+            return
+
         self.setStyleSheet(
             """
             QMainWindow, QWidget {
@@ -301,7 +367,7 @@ class MainWindow(QMainWindow):
             }
             """
         )
-    def change_language(self, language: str) -> None:
+    def change_language(self, language: str, persist: bool = True) -> None:
         if self.runner.is_busy():
             self.output_box.setPlainText(
                 "A program is currently running.\n"
@@ -343,8 +409,9 @@ class MainWindow(QMainWindow):
 
             self.current_lang = language
 
-            self.settings.set("language", language)
-            self.settings.save()
+            if persist:
+                self.settings.set("language", language)
+                self.settings.save()
 
             self.editor.document().setModified(
                 False
@@ -359,7 +426,18 @@ class MainWindow(QMainWindow):
             )
 
     def _show_settings(self) -> None:
-        dialog = SettingsDialog(self)
+        old_language = self.current_lang
+        dialog = SettingsDialog(self.settings, self)
 
         if dialog.exec():
-            print("Settings applied")
+            new_language = self.settings.get("language", "cpp")
+            self._apply_runtime_settings()
+            self._apply_styles()
+
+            if new_language != old_language:
+                self.current_lang = old_language
+                self.change_language(new_language, persist=False)
+
+            self.output_box.setPlainText(
+                "Settings applied."
+            )
